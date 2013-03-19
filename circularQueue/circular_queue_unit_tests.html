@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+<head>
+	<title>Circular Queue Tests</title>
+	<script src="http://yui.yahooapis.com/3.8.1/build/yui/yui-min.js"></script>
+	<script type="text/javascript" src="circularQueue.js"></script>
+</head>
+<body>
+	<div id="testLogger"></div>
+	<h1>Circular Queue Tests</h1>
+	<script type="text/javascript">
+	YUI().use('node', 'test-console', 'test', function (Y){
+
+		Y.namespace("test");
+
+		Y.test.CircularQueue = (function(){
+
+		  var assert = Y.Assert;
+
+      //-------------------------------------------------------------------------
+      // Base Test Suite
+      //-------------------------------------------------------------------------
+
+      var suite = new Y.Test.Suite("Circular Queue Tests");
+
+      //-------------------------------------------------------------------------
+      // Test Case for enqueing
+      //---------------------------------------------------------------------------
+
+      suite.add(new Y.Test.Case({
+
+        name : "enqueue() Tests",
+
+        setUp: function(){
+          this.circularQueue = new CircularQueue();
+          this.circularQueue.initialize(5);
+        },
+
+        tearDown: function(){
+          delete this.circularQueue;
+        },
+
+      //---------------------------------------------------------------------
+      // Tests
+      //---------------------------------------------------------------------
+
+      testEnqueueSingle: function(){
+
+        this.circularQueue.enqueue(10);
+
+        assert.areEqual(10, this.circularQueue.getQueue()[0]);
+      },
+
+      testEnqueueNonInteger: function(){
+
+        this.circularQueue.enqueue(20.34);
+
+        assert.isUndefined(this.circularQueue.getQueue()[0]);
+      },
+
+      testEnqueueMultiple: function(){
+
+        this.circularQueue.enqueue(10);
+        this.circularQueue.enqueue(20);
+        this.circularQueue.enqueue(30);
+        this.circularQueue.enqueue(40);
+        this.circularQueue.enqueue(50);
+
+        var queue = this.circularQueue.getQueue();
+
+        assert.areEqual(10, queue[0]);
+        assert.areEqual(20, queue[1]);
+        assert.areEqual(30, queue[2]);
+        assert.areEqual(40, queue[3]);
+        assert.areEqual(50, queue[4]);
+      },
+
+      testEnqueueQueueFull: function(){
+
+        assert.isTrue(this.circularQueue.enqueue(10));
+        assert.isTrue(this.circularQueue.enqueue(20));
+        assert.isTrue(this.circularQueue.enqueue(30));
+        assert.isTrue(this.circularQueue.enqueue(40));
+        assert.isTrue(this.circularQueue.enqueue(50));
+        assert.isFalse(this.circularQueue.enqueue(60));
+      }
+
+      }));
+
+    //-------------------------------------------------------------------------
+    // Test Case for dequeing
+    //-------------------------------------------------------------------------
+
+      suite.add(new Y.Test.Case({
+
+        name : "dequeue() Tests",
+
+        setUp: function(){
+          this.circularQueue = new CircularQueue();
+          this.circularQueue.initialize(5);
+
+          this.circularQueue.enqueue(10);
+          this.circularQueue.enqueue(20);
+          this.circularQueue.enqueue(30);
+          this.circularQueue.enqueue(40);
+          this.circularQueue.enqueue(50);
+
+        },
+
+        tearDown: function(){
+          delete this.circularQueue;
+        },
+
+          //---------------------------------------------------------------------
+          // Tests
+          //---------------------------------------------------------------------
+
+        testDequeueSingle: function(){
+
+            assert.areEqual(10, this.circularQueue.dequeue());
+         },
+
+        testDequeueMultiple: function(){
+
+            assert.areEqual(10,  this.circularQueue.dequeue());
+            assert.areEqual(20,  this.circularQueue.dequeue());
+            assert.areEqual(30,  this.circularQueue.dequeue());
+            assert.areEqual(40,  this.circularQueue.dequeue());
+            assert.areEqual(50,  this.circularQueue.dequeue());
+         },
+
+         testDequeueQueueEmpty: function(){
+
+            var count = 0;
+
+            while( count < 5 ) {
+              this.circularQueue.dequeue();
+              count++;
+            }
+
+            assert.isNull(this.circularQueue.dequeue());
+          },
+
+      }));
+
+      return suite;
+})();
+
+//create the console
+(new Y.Test.Console({
+	newestOnTop : false,
+	filters: {
+		pass: true,
+		fail: true
+	}
+})).render('#testLogger');
+
+Y.Test.Runner.add(Y.test.CircularQueue);
+
+    //run the tests
+    Y.Test.Runner.run();
+});
+
+</script>
+</body>
+
+</html>
